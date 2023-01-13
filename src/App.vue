@@ -5,6 +5,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <template >
 
     <div class="bg-[#272933] w-1920px h-screen">
+      <!--vue props--> 
       <HelloWorld />
     </div>
 
