@@ -8,7 +8,7 @@
       params: [
         {
           name: 'Temperature',
-          value: '+10',
+          value: '+1066666666666666',
           type: 'C',
           state: 'working',
           divisionSize: 5,
@@ -25,67 +25,75 @@
       ]
     });
 
-    /* Массивы для значений (нумерации) шкалы */
-    let firstParamScale = [];
-    let secondParamScale = [];
 
-    /* Размер делений */
-    const divisionSize = data.value["params"][0]["divisionSize"];
+    /* !!!!!!!!!!!!!!!!
+        Optional chaining (?.) не работает для 
+        шкалы значений, ошибка происходит при выводе
+        {{item}} 
+        !!!!!!!!!!!!!!
+    */
 
-    /* Расчет шкалы */
-    for (let index = 5; index >= 0; index--){
-      firstParamScale[index]=data.value.params[0].start + index * divisionSize;
-      secondParamScale[index]=data.value.params[1].start + index * divisionSize;
+    // Массивы для значений (нумерации) шкалы 
+    const firstParamScale = [];
+    const secondParamScale = [];
+
+    // Размер делений 
+    const divisionSize = data.value.params?.[0]["divisionSize"];
+
+    const scaleCount = 6;
+    // Расчет шкалы 
+    for (let index = 0; index <scaleCount; index++){
+
+      firstParamScale[index]=data.value.params?.[0].start + index * divisionSize;
+      secondParamScale[index]=data.value.params?.[1].start + index * divisionSize;
+
     }
-    console.log(firstParamScale);
-    console.log(secondParamScale);
 
+    firstParamScale.reverse();
+    secondParamScale.reverse();
 
-    /* Цвета параметров в стандартном состоянии */
+    // Цвета параметров в стандартном состоянии
     const firstParamColor = ref("#48A7FF");
     const secondParamColor = ref("#B378FF");
 
-    /* Изменение цвета состояния по первому параметру (левая шкала, нумерация шкалы и первое значение)*/
+    // Изменение цвета состояния по первому параметру (левая шкала, нумерация шкалы и первое значение)
     function changeFirstState(){
-      if (data.value["params"][0]["state"]!='working'){
+      if (data.value.params?.[0]["state"]!='working'){
         firstParamColor.value="#DB8181";
       }
-
       return firstParamColor.value;
     }
 
-    /* Изменение цвета состояния по второму параметру (правая шкала, нумерация шкалы и второе значение) */
+    // Изменение цвета состояния по второму параметру (правая шкала, нумерация шкалы и второе значение) 
     function changeSecondState(){
-      if(data.value["params"][1]["state"]!='working'){
+      if(data.value.params?.[1]["state"]!='working'){
         secondParamColor.value="#DB8181";
       }
-      
       return secondParamColor.value;
     }
 
 
-    /* Изменение цвета общего состояния (цвет рамки шкалы и краба) */
+    // Изменение цвета общего состояния (цвет рамки шкалы и краба) 
     function changeState(){
       console.log("kkk")
-      if (data.value["params"][0]["state"]!='working' || data.value["params"][1]["state"]!='working'){
+      if (data.value.params?.[0]["state"]!='working' || data.value?.params[1]["state"]!='working'){
         color.value= "#DB8181";
       }  
       return color.value;
     }
 
-    /*  */
-    function firstParamValue (){
+    // изменение размеров прямоугольников в зависимости от значений параметров
+    function firstParamHeight (){
       console.log("dkk")
-      let arr = (data.value["params"][0]["value"]).split("");
-      let num = arr[1];
+      const num = data.value.params?.[0]["value"];
       // num = ...
       return num + "vh";
     } 
 
-    function secondParamValue (){
+    function secondParamHeight (){
       console.log("dkk")
-      let arr = (data.value["params"][1]["value"]).split("");
-      let num = arr[1];
+      const num = data.value.params?.[1]["value"];
+
       // num = ...
       return num + "vh";
     }
@@ -115,7 +123,7 @@
 
         <div class=" absolute left-[0.95vw] bottom-[0.39vh] ">
           <!-- <img :style="{'filter':changeFirstState()}" src="../assets/icons/thermo.svg"/> -->
-          <svg class="w-[0.625vw] h-[10.2vh]" viewBox="0 0 14 112" :stroke="changeFirstState()" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg class="w-[0.625vw] h-[15.2vh]" viewBox="0 0 14 112" :stroke="changeFirstState()" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M1 1H7"  stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"/>
             <path d="M1 89H7"  stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"/>
             <path d="M1 45H7"  stroke-width="2" stroke-miterlimit="10" stroke-linecap="round"/>
@@ -151,8 +159,8 @@
         
         </div>
 
-        <div :style="{'background-color':changeFirstState(), 'height':firstParamValue()}" class="w-[0.35vw] absolute left-[1.07vw] bottom-[1.11vh]"></div>
-        <div :style="{'background-color':changeSecondState(), 'height':secondParamValue()}" class="w-[0.35vw] absolute right-[1.07vw] bottom-[1.11vh]"></div>
+        <div :style="{'background-color':changeFirstState(), 'height':firstParamHeight()}" class="w-[0.35vw] absolute left-[1.07vw] bottom-[1.11vh]"></div>
+        <div :style="{'background-color':changeSecondState(), 'height':secondParamHeight()}" class="w-[0.35vw] absolute right-[1.07vw] bottom-[1.11vh]"></div>
       
       <div class="absolute top-[2.05vh] left-[0.04vw] flex flex-col gap-[0.75vh]">
         <div :style="{'color':changeFirstState()}" v-for="item in firstParamScale" class="w-[0.78vw] h-[1.3vh] font-euclid text-[0.52vw] flex justify-end">{{item}}</div>
@@ -174,13 +182,13 @@
 
       <div class="flex flex-col mt-[2vh] ">
         <div class="flex flex-row gap-[0.4vw]">
-          <div class="w-[4.01vw] ml-[0.3vw] text-[#D6EBFF] font-medium text-[0.625vw] font-euclid flex items-center justify-end"> <div class="truncate">{{data["params"][0]["name"]}}</div>:</div>
-          <div :style="{'color':changeFirstState()}" class="w-[2.81vw] font-medium text-[0.83vw] font-euclid truncate flex items-center"> <div class="truncate mr-0.5">{{ data["params"][0]["value"] }}</div> {{data["params"][0]["type"]}} </div>
+          <div class="w-[4.01vw] ml-[0.3vw] text-[#D6EBFF] font-medium text-[0.625vw] font-euclid flex items-center justify-end"> <div class="truncate">{{data.params?.[0]["name"]}}</div>:</div>
+          <div :style="{'color':changeFirstState()}" class="w-[2.81vw] font-medium text-[0.83vw] font-euclid truncate flex items-center"> <div class="truncate mr-0.5">{{ data.params?.[0]["value"] }}</div> {{data.params?.[0]["type"]}} </div>
         </div>
 
         <div class="flex flex-row gap-[0.4vw] mt-[-0.3vh]"> 
-          <div class=" w-[4.01vw] ml-[0.3vw] text-[#D6EBFF] font-medium text-[0.625vw] font-euclid overflow-hidden flex items-center justify-end"><div class="truncate">{{data["params"][1]["name"]}}</div>:</div>
-          <div :style="{'color':changeSecondState()}" class="w-[3.5vw] font-medium text-[0.83vw] font-euclid truncate flex items-center"> <div class="truncate mr-0.5">{{ data["params"][1]["value"] }}</div> {{data["params"][1]["type"] }} </div>
+          <div class=" w-[4.01vw] ml-[0.3vw] text-[#D6EBFF] font-medium text-[0.625vw] font-euclid overflow-hidden flex items-center justify-end"><div class="truncate">{{data.params?.[1]["name"]}}</div>:</div>
+          <div :style="{'color':changeSecondState()}" class="w-[3.5vw] font-medium text-[0.83vw] font-euclid truncate flex items-center"> <div class="truncate mr-0.5">{{ data.params?.[1]["value"] }}</div> {{data.params?.[1]["type"] }} </div>
         </div>
       </div>
 
