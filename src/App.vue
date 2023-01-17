@@ -7,8 +7,8 @@ import Agregat from './components/Agregat.vue'
 
     <div class="bg-[#272933] w-1920px h-screen">
       <!--vue props--> 
-      <Crab />
-      <!-- <Agregat /> -->
+      <!-- <Crab /> -->
+      <Agregat />
       
     </div>
 
