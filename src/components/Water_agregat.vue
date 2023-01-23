@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
 
   const data = ref({
     name: 'CT4S HFO',
@@ -33,32 +33,39 @@
     ],
   });
 
-  const testValue = ref(75);
+  const testValue = ref(50);
 
   // Считает высоту шкалы (высоту прямоугольника)
-  function scaleHeight() {
+  const scaleHeight = computed(() => {
     let num = testValue.value;
     const oneUnit = 0.108;
     num *= oneUnit;
     num += 0.85;
     console.log(num);
     return num;
-  }
+  });
 
   // Считает позицию кружка со значением
-  function circlePosition() {
-    let height = scaleHeight();
-    const bottomIndent = 0.3;
-    height -= bottomIndent;
+  const circlePosition = computed(() => {
+    let height = 0;
+    if (testValue.value < 0) {
+      height = 0.6;
+    } else if (testValue.value > 100) {
+      height = 11.25;
+    } else {
+      height = scaleHeight.value;
+      const bottomIndent = 0.3;
+      height -= bottomIndent;
+    }
     return height;
-  }
+  });
   // Считает позицию значения, находящегося в кружке
-  function valueInCirclePosition() {
-    let height = scaleHeight();
-    const bottomIndent = 0.7;
-    height += bottomIndent;
-    return height;
-  }
+  // const valueInCirclePosition = computed(() => {
+  //   let height = scaleHeight.value;
+  //   const bottomIndent = 0.7;
+  //   height += bottomIndent;
+  //   return height;
+  // });
 
   function warningSignPosition() {
     console.log('hu');
@@ -183,13 +190,13 @@
         </svg>
         <!-- Прямоугольник меры -->
         <div
-          :style="{ height: scaleHeight() + 'vh', 'background-color': changeStateColor() }"
+          :style="{ height: scaleHeight + 'vh', 'background-color': changeStateColor() }"
           class="absolute left-[0.39vw] bottom-[0.8vh] w-[0.9vw] rounded-bl-md bg-[#66FE87]"></div>
         <!-- Кружок со значением -->
-        <svg
+        <!-- <svg
           class="absolute left-[0.2vw] h-[2.22vh] w-[1.25vw]"
           :stroke="changeStateColor()"
-          :style="{ bottom: circlePosition() + 'vh' }"
+          :style="{ bottom: circlePosition + 'vh' }"
           width="1.25vw"
           height="2.22vh"
           viewBox="0 0 24 24"
@@ -204,14 +211,24 @@
             rx="11.5"
             fill="#3E404C"
             stroke="#66FE87" />
-        </svg>
+        </svg> -->
 
-        <!-- Значение в кружке -->
         <div
-          class="absolute left-[0.22vw] h-[0.92vh] w-[1.25vw] text-center text-[0.625vw]"
-          :style="{ bottom: valueInCirclePosition() + 'vh', color: changeStateColor() }">
+          :style="{
+            'border-color': changeStateColor(),
+            bottom: circlePosition + 'vh',
+            color: changeStateColor(),
+          }"
+          class="absolute left-[0.2vw] flex h-[2.22vh] w-[1.25vw] items-center justify-center rounded-full border-[0.07vw] bg-[#3E404C] text-[0.625vw]">
           {{ testValue }}
         </div>
+
+        <!-- Значение в кружке -->
+        <!-- <div
+          class="absolute left-[0.22vw] h-[0.92vh] w-[1.25vw] text-center text-[0.625vw]"
+          :style="{ bottom: valueInCirclePosition + 'vh', color: changeStateColor() }">
+          {{ testValue }}
+        </div> -->
         <!-- Значок с предупреждением -->
         <svg
           v-if="['error', 'warning'].includes(data.state)"
@@ -236,6 +253,33 @@
           class="rounded-tr-0 rounded-br-0 ml-[0.73vw] flex h-[2.9vh] w-[8.3vw] items-center rounded-tl-3xl rounded-bl-3xl bg-[#272933]">
           <div class="ml-[0.83vw] truncate font-euclid text-[0.94vw] font-medium text-[#D6EBFF]">
             CT3P HFO
+          </div>
+        </div>
+        <div class="ml-[0.47vw] mt-[1.46vh] flex flex-col">
+          <div v-for="item in data.params" class="flex h-[1.4vh] flex-row gap-[0.52vw]">
+            <div class="flex w-[3.96vw] items-center justify-end text-[0.625vw] text-[#D6EBFF]">
+              <div class="overflow-hidden">{{ item.name }}</div>
+              :
+            </div>
+            <div
+              :style="{ color: changeStateColor() }"
+              class="flex w-[2.86vw] items-center gap-[0.15vw] text-[0.73vw] text-[#66FE87]">
+              <div class="overflow-hidden whitespace-nowrap">{{ item.value }}</div>
+              <div class="w-[1.5vw] overflow-hidden whitespace-nowrap">
+                {{ item.type }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-[1.2vh] ml-[6vw] flex flex-row items-center gap-[0.2vw]">
+          <div
+            class="flex h-[0.93vh] w-[0.68vw] items-center overflow-hidden truncate text-center font-euclid text-[0.42vw] font-medium text-[#35D1C8]">
+            WB
+          </div>
+          <img src="../assets/icons/agregat/vector.svg" class="" />
+          <div
+            class="flex h-[0.93vh] w-[0.68vw] items-center overflow-hidden truncate text-center font-euclid text-[0.42vw] font-medium text-[#33C300]">
+            ON
           </div>
         </div>
       </div>
