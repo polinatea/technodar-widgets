@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
 
   const data = ref({
     name: 'ГД1',
